@@ -1,0 +1,27 @@
+{
+  "name": "self-help-service-portal-backend",
+  "version": "1.0.0",
+  "description": "Self-Help-Service-Portal-backend repository",
+  "main": "index.js",
+  "scripts": {
+    "build": "rimraf dist && tsc",
+    "deploy:sandbox": "npm run build && serverless deploy --stage sandbox2",
+    "remove:sandbox": "serverless remove --stage sandbox2"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.147",
+    "@types/aws-sdk": "^2.7.4",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.7",
+    "rimraf": "^6.0.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.1692.0",
+    "express": "^4.21.2",
+    "serverless-http": "^3.2.0"
+  }
+}

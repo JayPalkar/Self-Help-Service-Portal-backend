@@ -1,0 +1,22 @@
+service: Self-Help-Service-Portal-backend
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  profile: ${self:custom.profiles.${opt:stage, 'sandbox2'}}
+  region: us-east-1
+  environment:
+    NODE_ENV: production
+
+custom:
+  profiles:
+    sandbox: AdministratorAccess-061051226351
+    sandbox2: AdministratorAccess-2-572163714811
+
+functions:
+  app:
+    handler: dist/app.handler
+    events:
+      - http:
+          path: /test
+          method: get
