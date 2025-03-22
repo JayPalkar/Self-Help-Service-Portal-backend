@@ -33,6 +33,24 @@ export const createUserInCognito = async (
   return { CognitoUserId: email, Email: email };
 };
 
+export const getUserFromCognito = async (email: string) => {
+  try {
+    const user = await cognito
+      .adminGetUser({
+        UserPoolId: USER_POOL_ID,
+        Username: email,
+      })
+      .promise();
+
+    return user;
+  } catch (error: any) {
+    if (error.code === "UserNotFoundException") {
+      return null;
+    }
+    throw error;
+  }
+};
+
 export const authenticateUser = async (email: string, password: string) => {
   const response = await cognito
     .initiateAuth({

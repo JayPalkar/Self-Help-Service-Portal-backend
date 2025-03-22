@@ -3,25 +3,19 @@ import {
   createUserInCognito,
   authenticateUser,
   globalSignOut,
+  getUserFromCognito,
 } from "../services/cognitoService";
 import { saveUserDetails } from "../services/userService";
 import { successResponse, errorResponse } from "../utils/responseHelper";
 
-export const registerAdmin = async (req: Request, res: Response) => {
-  try {
-    const { email, password } = req.body;
-    const cognitoUser = await createUserInCognito(email, password, "Admin");
-    return successResponse(res, 201, "Admin registered successfully", {
-      cognitoUser,
-    });
-  } catch (error) {
-    return errorResponse(res, error);
-  }
-};
-
 export const loginAdmin = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
+    const user = await getUserFromCognito(email);
+    if (!user) {
+      throw new Error("Admin not found");
+    }
+
     const authResult = await authenticateUser(email, password);
 
     res.cookie("idToken", authResult?.IdToken, {

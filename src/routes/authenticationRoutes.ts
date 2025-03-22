@@ -12,7 +12,6 @@ import {
 
 const router = Router();
 
-router.post("/admin/register", registerAdmin);
 router.post("/admin/login", loginAdmin);
 router.post("/admin/logout", logoutAdmin);
 router.post("/admin/create-employee", createEmployee);
