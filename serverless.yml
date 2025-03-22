@@ -7,6 +7,27 @@ provider:
   region: us-east-1
   environment:
     NODE_ENV: production
+    COGNITO_USER_POOL_ID: us-east-1_4MUwDBUrm
+    COGNITO_CLIENT_ID: 3iclk3cb58p485ah2iasfb3pha
+    DYNAMODB_USERS_TABLE: users
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - cognito-idp:AdminCreateUser
+        - cognito-idp:AdminSetUserPassword
+        - cognito-idp:AdminInitiateAuth
+        - cognito-idp:AdminGetUser
+      Resource: "arn:aws:cognito-idp:us-east-1:572163714811:userpool/us-east-1_4MUwDBUrm"
+
+    - Effect: Allow
+      Action:
+        - dynamodb:PutItem
+        - dynamodb:GetItem
+        - dynamodb:UpdateItem
+        - dynamodb:Scan
+        - dynamodb:Query
+      Resource: "arn:aws:dynamodb:us-east-1:572163714811:table/users"
 
 custom:
   profiles:
@@ -18,5 +39,20 @@ functions:
     handler: dist/app.handler
     events:
       - http:
-          path: /test
-          method: get
+          path: /auth/admin/register
+          method: post
+      - http:
+          path: /auth/admin/login
+          method: post
+      - http:
+          path: /auth/admin/logout
+          method: post
+      - http:
+          path: /auth/employee/login
+          method: post
+      - http:
+          path: /auth/employee/logout
+          method: post
+      - http:
+          path: /auth/admin/create-employee
+          method: post
