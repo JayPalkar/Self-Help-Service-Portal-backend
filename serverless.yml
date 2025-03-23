@@ -7,6 +7,47 @@ provider:
   region: us-east-1
   environment:
     NODE_ENV: production
+    COGNITO_USER_POOL_ID: us-east-1_Rsl2uQOv3
+    COGNITO_CLIENT_ID: 2qpfqqak5hm2cljmf8r92s1crf
+    DYNAMODB_USERS_TABLE: users
+    DYNAMODB_TEAMS_TABLE: Teams
+    DYNAMODB_PROJECTS_TABLE: projects
+    DYNAMODB_ATTENDANCE_TABLE: Attendance
+    DYNAMODB_LEAVE_TABLE: leave_requests
+    DYNAMODB_FINANCE_TABLE: finance_records
+    DYNAMODB_DOCUMENTS_TABLE: documents
+    DYNAMODB_TASKS_TABLE: tasks
+    DYNAMODB_PRIORITY_BOARDS_TABLE: priority_boards
+    S3_BUCKET_NAME: employee-documents-storage
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - cognito-idp:*
+      Resource: "arn:aws:cognito-idp:us-east-1:572163714811:userpool/us-east-1_Rsl2uQOv3"
+
+    - Effect: Allow
+      Action:
+        - dynamodb:*
+      Resource:
+        - "arn:aws:dynamodb:us-east-1:572163714811:table/users"
+        - "arn:aws:dynamodb:us-east-1:572163714811:table/Teams"
+        - "arn:aws:dynamodb:us-east-1:572163714811:table/projects"
+        - "arn:aws:dynamodb:us-east-1:572163714811:table/Attendance"
+        - "arn:aws:dynamodb:us-east-1:572163714811:table/leave_requests"
+        - "arn:aws:dynamodb:us-east-1:572163714811:table/finance_records"
+        - "arn:aws:dynamodb:us-east-1:572163714811:table/finance_records/index/*"
+        - "arn:aws:dynamodb:us-east-1:572163714811:table/documents"
+        - "arn:aws:dynamodb:us-east-1:572163714811:table/tasks"
+        - "arn:aws:dynamodb:us-east-1:572163714811:table/priority_boards"
+        - "arn:aws:dynamodb:us-east-1:572163714811:table/tasks/index/BoardId-Index"
+
+    - Effect: Allow
+      Action:
+        - s3:PutObject
+        - s3:GetObject
+      Resource:
+        - "arn:aws:s3:::employee-documents-storage/*"
 
 custom:
   profiles:
@@ -17,6 +58,192 @@ functions:
   app:
     handler: dist/app.handler
     events:
+      # ✅ Authentication Routes
       - http:
-          path: /test
+          path: /auth/admin/login
+          method: post
+          cors: true
+      - http:
+          path: /auth/admin/logout
+          method: post
+          cors: true
+      - http:
+          path: /auth/employee/login
+          method: post
+          cors: true
+      - http:
+          path: /auth/employee/logout
+          method: post
+          cors: true
+      - http:
+          path: /auth/admin/create-employee
+          method: post
+          cors: true
+
+      # ✅ Teams Routes
+      - http:
+          path: /employee
           method: get
+          cors: true
+
+      # ✅ Teams Routes
+      - http:
+          path: /teams
+          method: post
+          cors: true
+      - http:
+          path: /teams
+          method: get
+          cors: true
+      - http:
+          path: /teams/{id}
+          method: get
+          cors: true
+      - http:
+          path: /teams/{id}
+          method: put
+          cors: true
+      - http:
+          path: /teams/{id}
+          method: delete
+          cors: true
+
+      # ✅ Projects Routes
+      - http:
+          path: /projects
+          method: post
+          cors: true
+      - http:
+          path: /projects
+          method: get
+          cors: true
+      - http:
+          path: /projects/{id}
+          method: get
+          cors: true
+      - http:
+          path: /projects/{id}
+          method: put
+          cors: true
+      - http:
+          path: /projects/{id}
+          method: delete
+          cors: true
+
+      # ✅ Attendance Routes
+      - http:
+          path: /attendance/mark
+          method: post
+          cors: true
+      - http:
+          path: /attendance/user/{userId}
+          method: get
+          cors: true
+      - http:
+          path: /attendance/team/{teamId}/{date}
+          method: get
+          cors: true
+      - http:
+          path: /attendance/team/{teamId}/weekly
+          method: get
+          cors: true
+
+      # ✅ Leave Requests Routes
+      - http:
+          path: /leaves/request
+          method: post
+          cors: true
+      - http:
+          path: /leaves
+          method: get
+          cors: true
+      - http:
+          path: /leaves/{id}
+          method: get
+          cors: true
+      - http:
+          path: /leaves/{id}/approve
+          method: put
+          cors: true
+      - http:
+          path: /leaves/{id}/reject
+          method: put
+          cors: true
+      - http:
+          path: /leaves/{id}
+          method: delete
+          cors: true
+
+      # ✅ Finance Routes
+      - http:
+          path: /finance/distribute
+          method: post
+          cors: true
+      - http:
+          path: /finance/{id}/mark-paid
+          method: put
+          cors: true
+      - http:
+          path: /finance/{id}/check-in
+          method: put
+          cors: true
+      - http:
+          path: /finance
+          method: get
+          cors: true
+
+      # ✅ Document Management Routes
+      - http:
+          path: /documents/request
+          method: post
+          cors: true
+      - http:
+          path: /documents/requests
+          method: get
+          cors: true
+      - http:
+          path: /documents/{id}/upload
+          method: put
+          cors: true
+      - http:
+          path: /documents/{id}/reject
+          method: put
+          cors: true
+      - http:
+          path: /documents/{id}
+          method: get
+          cors: true
+
+      # ✅ Priority Board & Task Management Routes
+      - http:
+          path: /priority-board
+          method: post
+          cors: true
+      - http:
+          path: /priority-board/{teamId}
+          method: get
+          cors: true
+      - http:
+          path: /priority-board/{teamId}/tasks
+          method: post
+          cors: true
+      - http:
+          path: /priority-board/{teamId}/tasks
+          method: get
+          cors: true
+      - http:
+          path: /tasks/team/{teamId}
+          method: get
+          cors: true
+      - http:
+          path: /tasks/user/{userId}
+          method: get
+          cors: true
+      - http:
+          path: /tasks/{taskId}
+          method: get
+          cors: true
+      - http:
+          path: /tasks/{taskId}/update
+          method: put
+          cors: true
