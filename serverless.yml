@@ -14,6 +14,9 @@ provider:
     DYNAMODB_PROJECTS_TABLE: projects
     DYNAMODB_ATTENDANCE_TABLE: Attendance
     DYNAMODB_LEAVE_TABLE: leave_requests
+    DYNAMODB_FINANCE_TABLE: finance_records
+    DYNAMODB_DOCUMENTS_TABLE: documents
+    S3_BUCKET_NAME: employee-documents-storage
 
   iamRoleStatements:
     - Effect: Allow
@@ -26,18 +29,23 @@ provider:
 
     - Effect: Allow
       Action:
-        - dynamodb:PutItem
-        - dynamodb:GetItem
-        - dynamodb:Scan
-        - dynamodb:UpdateItem
-        - dynamodb:Query
-        - dynamodb:DeleteItem
+        - dynamodb:*
       Resource:
         - "arn:aws:dynamodb:us-east-1:572163714811:table/users"
         - "arn:aws:dynamodb:us-east-1:572163714811:table/Teams"
         - "arn:aws:dynamodb:us-east-1:572163714811:table/projects"
         - "arn:aws:dynamodb:us-east-1:572163714811:table/Attendance"
         - "arn:aws:dynamodb:us-east-1:572163714811:table/leave_requests"
+        - "arn:aws:dynamodb:us-east-1:572163714811:table/finance_records"
+        - "arn:aws:dynamodb:us-east-1:572163714811:table/finance_records/index/*"
+        - "arn:aws:dynamodb:us-east-1:572163714811:table/documents"
+
+    - Effect: Allow
+      Action:
+        - s3:PutObject
+        - s3:GetObject
+      Resource:
+        - "arn:aws:s3:::employee-documents-storage/*"
 
 custom:
   profiles:
@@ -147,4 +155,52 @@ functions:
       - http:
           path: /leaves/{id}
           method: delete
+          cors: true
+      - http:
+          path: /finance/distribute
+          method: post
+          cors: true
+      - http:
+          path: /finance/{id}/mark-paid
+          method: put
+          cors: true
+      - http:
+          path: /finance/{id}/check-in
+          method: put
+          cors: true
+      - http:
+          path: /finance
+          method: get
+          cors: true
+      - http:
+          path: /finance/report/{monthYear}
+          method: get
+          cors: true
+      - http:
+          path: /finance/pending
+          method: get
+          cors: true
+      - http:
+          path: /finance/history/{employeeId}
+          method: get
+          cors: true
+      - http:
+          path: /documents/request
+          method: post
+          cors: true
+      - http:
+          path: /documents/requests
+          method: get
+          cors: true
+      - http:
+          path: /documents/{id}/upload
+          method: put
+          cors: true
+      - http:
+          path: /documents/{id}/reject
+          method: put
+          cors: true
+      - http:
+          path: /documents/{id}
+          method: get
           cors: true
