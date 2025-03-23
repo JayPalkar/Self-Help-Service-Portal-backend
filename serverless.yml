@@ -10,6 +10,10 @@ provider:
     COGNITO_USER_POOL_ID: us-east-1_Rsl2uQOv3
     COGNITO_CLIENT_ID: 2qpfqqak5hm2cljmf8r92s1crf
     DYNAMODB_USERS_TABLE: users
+    DYNAMODB_TEAMS_TABLE: Teams
+    DYNAMODB_PROJECTS_TABLE: projects
+    DYNAMODB_ATTENDANCE_TABLE: Attendance
+    DYNAMODB_LEAVE_TABLE: leave_requests
 
   iamRoleStatements:
     - Effect: Allow
@@ -24,10 +28,16 @@ provider:
       Action:
         - dynamodb:PutItem
         - dynamodb:GetItem
-        - dynamodb:UpdateItem
         - dynamodb:Scan
+        - dynamodb:UpdateItem
         - dynamodb:Query
-      Resource: "arn:aws:dynamodb:us-east-1:572163714811:table/users"
+        - dynamodb:DeleteItem
+      Resource:
+        - "arn:aws:dynamodb:us-east-1:572163714811:table/users"
+        - "arn:aws:dynamodb:us-east-1:572163714811:table/Teams"
+        - "arn:aws:dynamodb:us-east-1:572163714811:table/projects"
+        - "arn:aws:dynamodb:us-east-1:572163714811:table/Attendance"
+        - "arn:aws:dynamodb:us-east-1:572163714811:table/leave_requests"
 
 custom:
   profiles:
@@ -41,15 +51,100 @@ functions:
       - http:
           path: /auth/admin/login
           method: post
+          cors: true
       - http:
           path: /auth/admin/logout
           method: post
+          cors: true
       - http:
           path: /auth/employee/login
           method: post
+          cors: true
       - http:
           path: /auth/employee/logout
           method: post
+          cors: true
       - http:
           path: /auth/admin/create-employee
           method: post
+          cors: true
+      - http:
+          path: /teams
+          method: post
+          cors: true
+      - http:
+          path: /teams
+          method: get
+          cors: true
+      - http:
+          path: /teams/{id}
+          method: get
+          cors: true
+      - http:
+          path: /teams/{id}
+          method: put
+          cors: true
+      - http:
+          path: /teams/{id}
+          method: delete
+          cors: true
+      - http:
+          path: /projects
+          method: post
+          cors: true
+      - http:
+          path: /projects
+          method: get
+          cors: true
+      - http:
+          path: /projects/{id}
+          method: get
+          cors: true
+      - http:
+          path: /projects/{id}
+          method: put
+          cors: true
+      - http:
+          path: /projects/{id}
+          method: delete
+          cors: true
+      - http:
+          path: /attendance/mark
+          method: post
+          cors: true
+      - http:
+          path: /attendance/user/{userId}
+          method: get
+          cors: true
+      - http:
+          path: /attendance/team/{teamId}/{date}
+          method: get
+          cors: true
+      - http:
+          path: /attendance/team/{teamId}/weekly
+          method: get
+          cors: true
+      - http:
+          path: /leaves/request
+          method: post
+          cors: true
+      - http:
+          path: /leaves
+          method: get
+          cors: true
+      - http:
+          path: /leaves/{id}
+          method: get
+          cors: true
+      - http:
+          path: /leaves/{id}/approve
+          method: put
+          cors: true
+      - http:
+          path: /leaves/{id}/reject
+          method: put
+          cors: true
+      - http:
+          path: /leaves/{id}
+          method: delete
+          cors: true

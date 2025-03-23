@@ -5,7 +5,7 @@ import {
   globalSignOut,
   getUserFromCognito,
 } from "../services/cognitoService";
-import { saveUserDetails } from "../services/userService";
+import { getUserRole, saveUserDetails } from "../services/userService";
 import { successResponse, errorResponse } from "../utils/responseHelper";
 
 export const loginAdmin = async (req: Request, res: Response) => {
@@ -17,6 +17,12 @@ export const loginAdmin = async (req: Request, res: Response) => {
     }
 
     const authResult = await authenticateUser(email, password);
+
+    const existingRole = await getUserRole(email);
+    if (!existingRole) {
+      console.log("🔹 Admin not found in DynamoDB, adding now...");
+      await saveUserDetails(email, "Admin", "", "", "");
+    }
 
     res.cookie("idToken", authResult?.IdToken, {
       httpOnly: true,
