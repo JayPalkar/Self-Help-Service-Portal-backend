@@ -6,7 +6,6 @@ const s3 = new AWS.S3();
 const TABLE_NAME = process.env.DYNAMODB_DOCUMENTS_TABLE || "";
 const BUCKET_NAME = process.env.S3_BUCKET_NAME || "";
 
-/** ✅ Create a new document request (Employee Request) */
 export const requestDocument = async (
   employeeId: string,
   documentType: string
@@ -27,7 +26,6 @@ export const requestDocument = async (
   return request;
 };
 
-/** ✅ Upload document to S3 */
 export const uploadDocumentToS3 = async (
   fileBuffer: Buffer,
   fileName: string
@@ -40,10 +38,9 @@ export const uploadDocumentToS3 = async (
   };
 
   const result = await s3.upload(params).promise();
-  return result.Location; // ✅ Returns S3 file URL
+  return result.Location;
 };
 
-/** ✅ Approve document request (Admin Action) */
 export const approveDocument = async (
   requestId: string,
   fileUrl: string,
@@ -66,7 +63,6 @@ export const approveDocument = async (
     .promise();
 };
 
-/** ✅ Reject document request (Admin Action) */
 export const rejectDocument = async (
   requestId: string,
   rejectionReason: string
@@ -85,7 +81,6 @@ export const rejectDocument = async (
     .promise();
 };
 
-/** ✅ Fetch all pending document requests (Admin View) */
 export const getPendingRequests = async () => {
   const result = await dynamoDB
     .scan({
@@ -99,7 +94,6 @@ export const getPendingRequests = async () => {
   return result.Items;
 };
 
-/** ✅ Get document details by RequestId */
 export const getDocumentById = async (requestId: string) => {
   const result = await dynamoDB
     .get({ TableName: TABLE_NAME, Key: { RequestId: requestId } })

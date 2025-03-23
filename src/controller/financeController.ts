@@ -11,7 +11,6 @@ import {
 import { successResponse, errorResponse } from "../utils/responseHelper";
 import { getCognitoUserId, getUserRole } from "../services/userService";
 
-// ✅ Admin can distribute stipends/salaries
 export const distributeStipendHandler = async (req: Request, res: Response) => {
   try {
     const accessToken = req.cookies.accessToken;
@@ -30,7 +29,6 @@ export const distributeStipendHandler = async (req: Request, res: Response) => {
   }
 };
 
-// ✅ Admin can mark stipend as paid
 export const markAsPaidHandler = async (req: Request, res: Response) => {
   try {
     const accessToken = req.cookies.accessToken;
@@ -49,7 +47,6 @@ export const markAsPaidHandler = async (req: Request, res: Response) => {
   }
 };
 
-// ✅ Admin can confirm manual check-in
 export const confirmCheckInHandler = async (req: Request, res: Response) => {
   try {
     const accessToken = req.cookies.accessToken;
@@ -72,7 +69,6 @@ export const confirmCheckInHandler = async (req: Request, res: Response) => {
   }
 };
 
-// ✅ Admin can get all finance records
 export const getAllFinanceRecordsHandler = async (
   req: Request,
   res: Response
@@ -97,7 +93,6 @@ export const getAllFinanceRecordsHandler = async (
   }
 };
 
-// ✅ Admin can get all pending payments
 export const getPendingPaymentsHandler = async (
   req: Request,
   res: Response
@@ -122,7 +117,6 @@ export const getPendingPaymentsHandler = async (
   }
 };
 
-// ✅ Admin can track total payments made to an employee
 export const getEmployeePaymentHistoryHandler = async (
   req: Request,
   res: Response
@@ -152,7 +146,6 @@ export const getEmployeePaymentHistoryHandler = async (
   }
 };
 
-// ✅ Admin can get a report for a specific month
 export const getMonthlyReportHandler = async (req: Request, res: Response) => {
   try {
     const accessToken = req.cookies.accessToken;

@@ -6,9 +6,10 @@ const TABLE_NAME = process.env.DYNAMODB_USERS_TABLE || "";
 
 export const saveUserDetails = async (
   cognitoUserId: string,
+  team: string,
   role: string,
-  dob: string,
-  joiningDate: string,
+  DateOfBirth: string,
+  DateOfJoining: string,
   upiId: string
 ) => {
   await dynamoDB
@@ -16,9 +17,10 @@ export const saveUserDetails = async (
       TableName: TABLE_NAME,
       Item: {
         CognitoUserId: cognitoUserId,
+        Team: team,
         Role: role,
-        DOB: dob,
-        JoiningDate: joiningDate,
+        DateOfBirth: DateOfBirth,
+        DateOfJoining: DateOfJoining,
         UPI_ID: upiId,
       },
     })
@@ -56,4 +58,18 @@ export const getUserRole = async (email: string): Promise<string | null> => {
     .promise();
 
   return result.Item?.Role || null;
+};
+
+export const deleteUserFromDynamoDB = async (email: string) => {
+  try {
+    await dynamoDB
+      .delete({
+        TableName: TABLE_NAME,
+        Key: { email },
+      })
+      .promise();
+    console.log(`✅ User ${email} deleted from DynamoDB`);
+  } catch (error) {
+    console.error(`❌ Failed to delete user ${email} from DynamoDB:`, error);
+  }
 };

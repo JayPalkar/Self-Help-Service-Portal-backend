@@ -4,14 +4,13 @@ import { v4 as uuidv4 } from "uuid";
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
 const TABLE_NAME = process.env.DYNAMODB_FINANCE_TABLE || "";
 
-// ✅ Record stipend/salary distribution
 export const distributeStipend = async (
   employeeId: string,
   amount: number,
   paidBy: string
 ) => {
   const transactionId = uuidv4();
-  const monthYear = new Date().toISOString().slice(0, 7); // YYYY-MM format
+  const monthYear = new Date().toISOString().slice(0, 7);
 
   const record = {
     TransactionId: transactionId,
@@ -34,7 +33,6 @@ export const distributeStipend = async (
   return record;
 };
 
-// ✅ Mark stipend/salary as paid
 export const markAsPaid = async (transactionId: string, paidBy: string) => {
   if (!transactionId) {
     throw new Error("TransactionId is required.");
@@ -42,7 +40,6 @@ export const markAsPaid = async (transactionId: string, paidBy: string) => {
 
   console.log(transactionId);
 
-  // Check if transaction exists
   const transaction = await dynamoDB
     .get({
       TableName: TABLE_NAME,
@@ -62,7 +59,7 @@ export const markAsPaid = async (transactionId: string, paidBy: string) => {
       Key: { TransactionId: transactionId },
       UpdateExpression:
         "SET #status = :status, PaidBy = :paidBy, PaidOn = :paidOn",
-      ExpressionAttributeNames: { "#status": "Status" }, // ✅ Fix reserved keyword
+      ExpressionAttributeNames: { "#status": "Status" },
       ExpressionAttributeValues: {
         ":status": "Paid",
         ":paidBy": paidBy,
@@ -74,7 +71,6 @@ export const markAsPaid = async (transactionId: string, paidBy: string) => {
   return { message: "Stipend marked as paid" };
 };
 
-// ✅ Confirm manual check-in
 export const confirmCheckIn = async (transactionId: string) => {
   await dynamoDB
     .update({
@@ -88,13 +84,11 @@ export const confirmCheckIn = async (transactionId: string) => {
   return { message: "Manual check-in confirmed" };
 };
 
-// ✅ Get all financial records
 export const getAllFinanceRecords = async () => {
   const result = await dynamoDB.scan({ TableName: TABLE_NAME }).promise();
   return result.Items;
 };
 
-// ✅ Get all pending payments
 export const getPendingPayments = async () => {
   const result = await dynamoDB
     .scan({
@@ -108,7 +102,6 @@ export const getPendingPayments = async () => {
   return result.Items;
 };
 
-// ✅ Get total payments made to an employee over time
 export const getEmployeePaymentHistory = async (employeeId: string) => {
   const result = await dynamoDB
     .query({
@@ -130,12 +123,11 @@ export const getEmployeePaymentHistory = async (employeeId: string) => {
   };
 };
 
-// ✅ Get aggregated report for a specific month
 export const getMonthlyReport = async (monthYear: string) => {
   const result = await dynamoDB
     .query({
       TableName: TABLE_NAME,
-      IndexName: "MonthYearIndex", // Assuming a GSI for MonthYear
+      IndexName: "MonthYearIndex",
       KeyConditionExpression: "MonthYear = :monthYear",
       ExpressionAttributeValues: { ":monthYear": monthYear },
     })

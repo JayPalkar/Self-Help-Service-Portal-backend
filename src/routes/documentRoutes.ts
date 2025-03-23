@@ -11,10 +11,10 @@ import {
 
 const router = express.Router();
 
-router.post("/request", requestDocumentHandler); // Employee requests a document
-router.get("/requests", getPendingRequestsHandler); // Admin views all requests
-router.put("/:id/upload", uploadDocumentHandler); // Admin uploads a document
-router.put("/:id/reject", rejectDocumentHandler); // Admin rejects a request
-router.get("/:id", getDocumentHandler); // Employee views document
+router.post("/request", requestDocumentHandler);
+router.get("/requests", getPendingRequestsHandler);
+router.put("/:id/upload", uploadDocumentHandler);
+router.put("/:id/reject", rejectDocumentHandler);
+router.get("/:id", getDocumentHandler);
 
 export default router;

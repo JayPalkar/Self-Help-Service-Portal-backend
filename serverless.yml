@@ -16,15 +16,14 @@ provider:
     DYNAMODB_LEAVE_TABLE: leave_requests
     DYNAMODB_FINANCE_TABLE: finance_records
     DYNAMODB_DOCUMENTS_TABLE: documents
+    DYNAMODB_TASKS_TABLE: tasks
+    DYNAMODB_PRIORITY_BOARDS_TABLE: priority_boards
     S3_BUCKET_NAME: employee-documents-storage
 
   iamRoleStatements:
     - Effect: Allow
       Action:
-        - cognito-idp:AdminCreateUser
-        - cognito-idp:AdminSetUserPassword
-        - cognito-idp:AdminInitiateAuth
-        - cognito-idp:AdminGetUser
+        - cognito-idp:*
       Resource: "arn:aws:cognito-idp:us-east-1:572163714811:userpool/us-east-1_Rsl2uQOv3"
 
     - Effect: Allow
@@ -39,6 +38,9 @@ provider:
         - "arn:aws:dynamodb:us-east-1:572163714811:table/finance_records"
         - "arn:aws:dynamodb:us-east-1:572163714811:table/finance_records/index/*"
         - "arn:aws:dynamodb:us-east-1:572163714811:table/documents"
+        - "arn:aws:dynamodb:us-east-1:572163714811:table/tasks"
+        - "arn:aws:dynamodb:us-east-1:572163714811:table/priority_boards"
+        - "arn:aws:dynamodb:us-east-1:572163714811:table/tasks/index/BoardId-Index"
 
     - Effect: Allow
       Action:
@@ -56,6 +58,7 @@ functions:
   app:
     handler: dist/app.handler
     events:
+      # ✅ Authentication Routes
       - http:
           path: /auth/admin/login
           method: post
@@ -76,6 +79,14 @@ functions:
           path: /auth/admin/create-employee
           method: post
           cors: true
+
+      # ✅ Teams Routes
+      - http:
+          path: /employee
+          method: get
+          cors: true
+
+      # ✅ Teams Routes
       - http:
           path: /teams
           method: post
@@ -96,6 +107,8 @@ functions:
           path: /teams/{id}
           method: delete
           cors: true
+
+      # ✅ Projects Routes
       - http:
           path: /projects
           method: post
@@ -116,6 +129,8 @@ functions:
           path: /projects/{id}
           method: delete
           cors: true
+
+      # ✅ Attendance Routes
       - http:
           path: /attendance/mark
           method: post
@@ -132,6 +147,8 @@ functions:
           path: /attendance/team/{teamId}/weekly
           method: get
           cors: true
+
+      # ✅ Leave Requests Routes
       - http:
           path: /leaves/request
           method: post
@@ -156,6 +173,8 @@ functions:
           path: /leaves/{id}
           method: delete
           cors: true
+
+      # ✅ Finance Routes
       - http:
           path: /finance/distribute
           method: post
@@ -172,18 +191,8 @@ functions:
           path: /finance
           method: get
           cors: true
-      - http:
-          path: /finance/report/{monthYear}
-          method: get
-          cors: true
-      - http:
-          path: /finance/pending
-          method: get
-          cors: true
-      - http:
-          path: /finance/history/{employeeId}
-          method: get
-          cors: true
+
+      # ✅ Document Management Routes
       - http:
           path: /documents/request
           method: post
@@ -203,4 +212,38 @@ functions:
       - http:
           path: /documents/{id}
           method: get
+          cors: true
+
+      # ✅ Priority Board & Task Management Routes
+      - http:
+          path: /priority-board
+          method: post
+          cors: true
+      - http:
+          path: /priority-board/{teamId}
+          method: get
+          cors: true
+      - http:
+          path: /priority-board/{teamId}/tasks
+          method: post
+          cors: true
+      - http:
+          path: /priority-board/{teamId}/tasks
+          method: get
+          cors: true
+      - http:
+          path: /tasks/team/{teamId}
+          method: get
+          cors: true
+      - http:
+          path: /tasks/user/{userId}
+          method: get
+          cors: true
+      - http:
+          path: /tasks/{taskId}
+          method: get
+          cors: true
+      - http:
+          path: /tasks/{taskId}/update
+          method: put
           cors: true

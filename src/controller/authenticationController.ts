@@ -4,8 +4,13 @@ import {
   authenticateUser,
   globalSignOut,
   getUserFromCognito,
+  getUserGroups,
 } from "../services/cognitoService";
-import { getUserRole, saveUserDetails } from "../services/userService";
+import {
+  deleteUserFromDynamoDB,
+  getUserRole,
+  saveUserDetails,
+} from "../services/userService";
 import { successResponse, errorResponse } from "../utils/responseHelper";
 
 export const loginAdmin = async (req: Request, res: Response) => {
@@ -16,12 +21,17 @@ export const loginAdmin = async (req: Request, res: Response) => {
       throw new Error("Admin not found");
     }
 
+    const userGroups = await getUserGroups(email);
+    if (!userGroups.includes("Admin")) {
+      throw new Error("Unauthorized: User is not an Admin");
+    }
+
     const authResult = await authenticateUser(email, password);
 
     const existingRole = await getUserRole(email);
     if (!existingRole) {
       console.log("🔹 Admin not found in DynamoDB, adding now...");
-      await saveUserDetails(email, "Admin", "", "", "");
+      await saveUserDetails(email, "Admin", "", "", "", "");
     }
 
     res.cookie("idToken", authResult?.IdToken, {
@@ -97,15 +107,25 @@ export const logoutEmployee = async (req: Request, res: Response) => {
 
 export const createEmployee = async (req: Request, res: Response) => {
   try {
-    const { email, password, role, dob, joiningDate, upiId } = req.body;
+    const { email, password, team, role, dateOfBirth, dateOfJoining, upiId } =
+      req.body;
+
+    const existingUser = await getUserFromCognito(email);
+    if (existingUser) {
+      return errorResponse(res, "User already exists in Cognito", 400);
+    }
+
     const cognitoUser = await createUserInCognito(email, password, "Employee");
+
     await saveUserDetails(
       cognitoUser.CognitoUserId,
+      team,
       role,
-      dob,
-      joiningDate,
+      dateOfBirth,
+      dateOfJoining,
       upiId
     );
+
     return successResponse(res, 201, "Employee created successfully");
   } catch (error) {
     return errorResponse(res, error);
